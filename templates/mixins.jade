@@ -289,5 +289,41 @@ mixin ContentTriple()
                         //- and responses.
                         if action.parameters.length
                             +Parameters(action.parameters)
+                            
+                        if action.content.length
+                            .title
+                                strong Attributes
+                            each attr in action.content
+                                +Attribute(attr)
 
                 hr.split
+
+mixin Attribute(attr)
+    if attr.element == "member"
+        dl.inner
+            dt= self.urldec(attr.content.key.content)
+            dd
+                code= attr.content.value.element
+                | &nbsp;
+                if attr.attributes.typeAttributes.includes("required")
+                    span.required (required)
+                else
+                    span (optional)
+                | &nbsp;
+                - defalutValue = (attr.content.value.attributes || {}).default
+                - defalutValue = Array.isArray(defalutValue) ? defalutValue[0] : defalutValue
+                if defalutValue
+                    span.text-info.default
+                        strong Default:&nbsp;
+                        span= defalutValue.content || defalutValue
+                    | &nbsp;
+                != self.markdown(attr.meta.description)
+                if [ "array", "enum" ].includes(attr.content.value.element) && attr.content.value.content
+                    p.choices
+                        strong Choices:&nbsp;
+                        each value in attr.content.value.content
+                            code= self.urldec(value.content)
+
+    else
+        each child in attr.content
+            +Attribute(child)
